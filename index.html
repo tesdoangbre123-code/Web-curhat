@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SobatTenang — Ruang Aman Kamu</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+      --color-sage:       #f7f9f6;
+      --color-sage-mid:   #e8f0e4;
+      --color-sage-dark:  #c5d9bc;
+      --color-moss:       #4a7c59;
+      --color-moss-dark:  #365c42;
+      --color-warm:       #fdf6ee;
+      --color-peach:      #f2c49b;
+      --color-peach-soft: #fce8d5;
+      --color-text:       #2d3a2e;
+      --color-muted:      #6b7c6e;
+    }
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-sage);
+      color: var(--color-text);
+    }
+    .leaf-dot::before {
+      content: "🌿";
+      margin-right: 0.4rem;
+      font-size: 0.9em;
+    }
+    .btn-primary {
+      background-color: var(--color-moss);
+      color: white;
+      font-weight: 600;
+      padding: 0.75rem 1.75rem;
+      border-radius: 999px;
+      transition: background-color 0.2s, transform 0.1s;
+      cursor: pointer;
+      border: none;
+      display: inline-block;
+    }
+    .btn-primary:hover  { background-color: var(--color-moss-dark); }
+    .btn-primary:active { transform: scale(0.97); }
+    .card {
+      background-color: white;
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      box-shadow: 0 2px 12px rgba(74,124,89,0.07);
+    }
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--color-moss) !important;
+      box-shadow: 0 0 0 3px rgba(74,124,89,0.12);
+    }
+    .tip-icon {
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    /* Tab styles */
+    .tab-btn {
+      flex: 1;
+      padding: 0.65rem 0;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+      background: transparent;
+      color: var(--color-muted);
+    }
+    .tab-btn.active {
+      background-color: var(--color-moss);
+      color: white;
+    }
+    /* Modal */
+    #modal { transition: opacity 0.25s ease; }
+    #modal.hidden { display: none; }
+    /* Feed entry animation */
+    @keyframes fadeIn {
+      from { opacity:0; transform: translateY(8px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .feed-entry { animation: fadeIn 0.3s ease; }
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    /* Avatar circle */
+    .avatar {
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      color: white;
+    }
+    /* Hug button */
+    .hug-btn {
+      border: 1.5px solid var(--color-sage-dark);
+      border-radius: 999px;
+      padding: 0.25rem 0.7rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-muted);
+      background: transparent;
+      cursor: pointer;
+      transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .hug-btn:hover, .hug-btn.hugged {
+      background-color: var(--color-peach-soft);
+      border-color: var(--color-peach);
+      color: #b8602a;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ═══════════════════════ HEADER ═══════════════════════ -->
+  <header style="background-color:white; border-bottom:1px solid var(--color-sage-mid); position:sticky; top:0; z-index:40;">
+    <div class="max-w-md mx-auto px-5 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span style="font-size:1.6rem; line-height:1;">🌿</span>
+        <span style="font-weight:800; font-size:1.15rem; color:var(--color-moss-dark); letter-spacing:-0.5px;">SobatTenang</span>
+      </div>
+      <span style="background-color:var(--color-sage-mid); color:var(--color-moss-dark); font-size:0.7rem; font-weight:600; padding:0.3rem 0.75rem; border-radius:999px; letter-spacing:0.4px;">
+        Ruang Siswa
+      </span>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════ HERO ═══════════════════════ -->
+  <section style="background:linear-gradient(160deg,var(--color-sage) 0%,var(--color-warm) 100%); padding:2.5rem 1.25rem 2rem;">
+    <div class="max-w-md mx-auto text-center">
+      <p class="leaf-dot" style="font-size:0.72rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--color-moss); margin-bottom:0.875rem;">Kamu tidak sendirian</p>
+      <h1 style="font-size:1.9rem; font-weight:800; line-height:1.2; color:var(--color-moss-dark); margin-bottom:0.875rem; letter-spacing:-0.5px;">
+        Hari ini boleh<br/>terasa berat.
+      </h1>
+      <p style="font-size:0.95rem; line-height:1.7; color:var(--color-muted); max-width:300px; margin:0 auto 1.75rem;">
+        Tuangkan isi hatimu, baca cerita teman lain, dan tahu bahwa kamu <strong style="color:var(--color-text);">tidak pernah sendiri.</strong>
+      </p>
+      <a href="#main-tabs" style="text-decoration:none;">
+        <span style="display:inline-flex; align-items:center; gap:0.4rem; background-color:white; border:1px solid var(--color-sage-dark); color:var(--color-moss); font-size:0.82rem; font-weight:600; padding:0.5rem 1.25rem; border-radius:999px; box-shadow:0 1px 6px rgba(74,124,89,0.1);">
+          Mulai ↓
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════ TAB NAVIGATION ═══════════════════════ -->
+  <div id="main-tabs" style="padding:0 1.25rem; margin-top:-0.5rem; position:sticky; top:65px; z-index:30; background-color:var(--color-sage); padding-top:0.75rem; padding-bottom:0.75rem;">
+    <div class="max-w-md mx-auto">
+      <div style="display:flex; gap:0.4rem; background-color:var(--color-sage-mid); border-radius:999px; padding:0.3rem;">
+        <button class="tab-btn active" id="tab-curhat" onclick="switchTab('curhat')">
+          💬 Curhat Sekarang
+        </button>
+        <button class="tab-btn" id="tab-feed" onclick="switchTab('feed')">
+          🫂 Ruang Bersama
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ PANEL: CURHAT ═══════════════════════ -->
+  <div id="panel-curhat" style="padding:0.75rem 1.25rem 0;">
+    <div class="max-w-md mx-auto">
+      <div class="card" style="border-top:4px solid var(--color-moss);">
+        <div class="flex items-center gap-3" style="margin-bottom:1.25rem;">
+          <div class="tip-icon" style="background-color:var(--color-sage-mid);">💬</div>
+          <div>
+            <p style="font-weight:700; font-size:1rem; color:var(--color-text);">Kotak Curhat</p>
+            <p style="font-size:0.75rem; color:var(--color-muted);">Tulis dengan username · Dibagikan ke Ruang Bersama</p>
+          </div>
+        </div>
+
+        <!-- Username field -->
+        <label style="font-size:0.8rem; font-weight:600; color:var(--color-moss-dark); display:block; margin-bottom:0.4rem;">
+          Username kamu
+        </label>
+        <div style="position:relative; margin-bottom:1rem;">
+          <span style="position:absolute; left:0.875rem; top:50%; transform:translateY(-50%); color:var(--color-muted); font-size:0.9rem;">@</span>
+          <input
+            type="text"
+            id="usernameInput"
+            maxlength="24"
+            placeholder="misalnya: BintangKecil atau AnonSenin"
+            style="
+              width:100%; box-sizing:border-box;
+              border:1.5px solid var(--color-sage-mid);
+              border-radius:0.875rem;
+              padding:0.7rem 1rem 0.7rem 1.75rem;
+              font-family:var(--font-sans);
+              font-size:0.88rem;
+              color:var(--color-text);
+              background-color:var(--color-sage);
+              transition:border-color 0.2s, box-shadow 0.2s;
+            "
+          />
+        </div>
+
+        <!-- Textarea curhat -->
+        <label style="font-size:0.8rem; font-weight:600; color:var(--color-moss-dark); display:block; margin-bottom:0.4rem;">
+          Isi curhatanmu
+        </label>
+        <textarea
+          id="curhatInput"
+          rows="5"
+          placeholder="Ceritakan saja… apa yang lagi kamu rasakan hari ini? Tidak ada yang akan menghakimi kamu di sini."
+          style="
+            width:100%; box-sizing:border-box; resize:none;
+            border:1.5px solid var(--color-sage-mid);
+            border-radius:0.875rem;
+            padding:1rem;
+            font-family:var(--font-sans);
+            font-size:0.92rem; line-height:1.65;
+            color:var(--color-text);
+            background-color:var(--color-sage);
+            transition:border-color 0.2s, box-shadow 0.2s;
+          "
+        ></textarea>
+
+        <p style="font-size:0.7rem; color:var(--color-muted); margin:0.5rem 0 1.25rem; text-align:right;">
+          Curhatan akan terlihat di Ruang Bersama.
+        </p>
+
+        <button class="btn-primary" onclick="kirimCurhat()" style="width:100%; text-align:center;">
+          Kirim Curhat 🌿
+        </button>
+
+        <p style="font-size:0.7rem; color:var(--color-muted); text-align:center; margin-top:0.85rem; line-height:1.5;">
+          Tidak ada data pribadi yang dikumpulkan. Username hanya untuk tampilan.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ PANEL: RUANG BERSAMA (FEED) ═══════════════════════ -->
+  <div id="panel-feed" style="display:none; padding:0.75rem 1.25rem 0;">
+    <div class="max-w-md mx-auto">
+
+      <!-- Feed header info -->
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+        <div>
+          <p style="font-weight:700; font-size:0.95rem; color:var(--color-text);">Ruang Bersama 🫂</p>
+          <p id="feedCount" style="font-size:0.75rem; color:var(--color-muted);">Memuat curhatan…</p>
+        </div>
+        <button onclick="muat()" style="font-size:0.75rem; font-weight:600; color:var(--color-moss); background:var(--color-sage-mid); border:none; padding:0.35rem 0.875rem; border-radius:999px; cursor:pointer;">
+          ↻ Segarkan
+        </button>
+      </div>
+
+      <!-- Feed list -->
+      <div id="feedList"></div>
+
+      <!-- Empty state -->
+      <div id="feedEmpty" style="display:none; text-align:center; padding:3rem 1rem;">
+        <div style="font-size:2.5rem; margin-bottom:0.75rem;">🌱</div>
+        <p style="font-weight:700; color:var(--color-moss-dark); margin-bottom:0.4rem;">Belum ada curhatan</p>
+        <p style="font-size:0.83rem; color:var(--color-muted); line-height:1.6;">
+          Jadilah yang pertama berbagi di Ruang Bersama.<br/>Curhatan kamu mungkin bisa menolong orang lain merasa tidak sendirian.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ TIPS KESEHATAN MENTAL ═══════════════════════ -->
+  <section style="padding:2.5rem 1.25rem 1rem;">
+    <div class="max-w-md mx-auto">
+      <p class="leaf-dot" style="font-size:0.7rem; font-weight:600; letter-spacing:1.4px; text-transform:uppercase; color:var(--color-moss); margin-bottom:0.5rem;">Tips Untukmu</p>
+      <h2 style="font-size:1.3rem; font-weight:800; color:var(--color-moss-dark); margin-bottom:1.5rem; line-height:1.3;">
+        Cara kecil yang bisa<br/>membantu hari ini
+      </h2>
+
+      <!-- Tip 1 -->
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="flex items-start gap-4">
+          <div class="tip-icon" style="background-color:#dff0d8; color:#3a7d44;">🌬️</div>
+          <div>
+            <p style="font-weight:700; font-size:0.95rem; margin-bottom:0.4rem;">Teknik Napas 4-7-8</p>
+            <p style="font-size:0.83rem; color:var(--color-muted); line-height:1.65;">
+              Hirup napas selama <strong>4 detik</strong>, tahan selama <strong>7 detik</strong>, lalu hembuskan perlahan selama <strong>8 detik</strong>. Ulangi 3–4 kali. Cocok saat cemas tiba-tiba menyerang.
+            </p>
+            <span style="display:inline-block; margin-top:0.75rem; font-size:0.7rem; font-weight:600; color:var(--color-moss); background-color:var(--color-sage-mid); padding:0.25rem 0.65rem; border-radius:999px;">Meredakan cemas · 2 menit</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tip 2 -->
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="flex items-start gap-4">
+          <div class="tip-icon" style="background-color:#fce8d5; color:#b8602a;">📓</div>
+          <div>
+            <p style="font-weight:700; font-size:0.95rem; margin-bottom:0.4rem;">Jurnal Emosi Harian</p>
+            <p style="font-size:0.83rem; color:var(--color-muted); line-height:1.65;">
+              Setiap malam, tulis 3 hal: <em>apa yang kamu rasakan</em>, <em>kenapa kamu merasa begitu</em>, dan <em>satu hal kecil yang bisa kamu syukuri</em>. Tidak perlu bagus — yang penting jujur.
+            </p>
+            <span style="display:inline-block; margin-top:0.75rem; font-size:0.7rem; font-weight:600; color:#b8602a; background-color:var(--color-peach-soft); padding:0.25rem 0.65rem; border-radius:999px;">Mengenali diri · 5 menit</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tip 3 -->
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="flex items-start gap-4">
+          <div class="tip-icon" style="background-color:#e8e4f4; color:#5c4fa0;">📵</div>
+          <div>
+            <p style="font-weight:700; font-size:0.95rem; margin-bottom:0.4rem;">Digital Detox Mini</p>
+            <p style="font-size:0.83rem; color:var(--color-muted); line-height:1.65;">
+              Coba 30 menit sebelum tidur tanpa layar. Ganti scroll dengan stretching ringan, membaca, atau sekadar diam dan bernapas.
+            </p>
+            <span style="display:inline-block; margin-top:0.75rem; font-size:0.7rem; font-weight:600; color:#5c4fa0; background-color:#e8e4f4; padding:0.25rem 0.65rem; border-radius:999px;">Tidur lebih baik · Setiap malam</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+  <footer style="padding:1.5rem 1.25rem 2.5rem; margin-top:1rem;">
+    <div class="max-w-md mx-auto">
+      <div style="background-color:var(--color-peach-soft); border:1px solid var(--color-peach); border-radius:0.875rem; padding:1rem 1.125rem; margin-bottom:1.5rem;">
+        <p style="font-size:0.72rem; font-weight:700; color:#b8602a; margin-bottom:0.3rem; text-transform:uppercase; letter-spacing:0.8px;">⚠️ Penting Diketahui</p>
+        <p style="font-size:0.77rem; color:#7a4a28; line-height:1.6;">
+          SobatTenang <strong>bukan pengganti layanan kesehatan mental profesional.</strong> Jika kamu merasa dalam bahaya atau butuh bantuan segera, hubungi <strong>Into The Light Indonesia: 119 ext. 8</strong> atau bicaralah dengan orang dewasa terpercaya di sekitarmu.
+        </p>
+      </div>
+      <div style="text-align:center;">
+        <p style="font-size:0.78rem; color:var(--color-muted);">Dibuat dengan 💚 untuk kesehatan mental remaja Indonesia</p>
+        <p style="font-size:0.7rem; color:var(--color-sage-dark); margin-top:0.4rem;">© 2025 SobatTenang · Semua perasaan itu valid.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════ MODAL SUKSES ═══════════════════════ -->
+  <div id="modal" class="hidden" style="position:fixed; inset:0; z-index:50; background-color:rgba(45,58,46,0.55); backdrop-filter:blur(3px); display:flex; align-items:flex-end; justify-content:center; padding:0 1rem 1.5rem;">
+    <div style="background-color:white; border-radius:1.5rem; padding:2rem 1.5rem 1.75rem; max-width:420px; width:100%; text-align:center; box-shadow:0 -4px 40px rgba(74,124,89,0.15); animation:slideUp 0.3s ease;">
+      <div style="font-size:3rem; margin-bottom:1rem; line-height:1;">🌿</div>
+      <h2 style="font-size:1.2rem; font-weight:800; color:var(--color-moss-dark); margin-bottom:0.5rem; line-height:1.3;">
+        Curhatan kamu sudah sampai. ✨
+      </h2>
+      <p id="modalName" style="font-size:0.85rem; font-weight:600; color:var(--color-moss); margin-bottom:0.875rem;"></p>
+      <p style="font-size:0.88rem; color:var(--color-muted); line-height:1.7; margin-bottom:0.5rem;">
+        Butuh keberanian untuk mengeluarkan apa yang ada di dalam hati. Kamu sudah melakukannya — itu langkah yang berarti.
+      </p>
+      <p style="font-size:0.88rem; color:var(--color-muted); line-height:1.7; margin-bottom:1.5rem;">
+        Ingat: <strong style="color:var(--color-text);">perasaan ini tidak akan selamanya.</strong> Seperti cuaca, ia akan berlalu. 🌤️
+      </p>
+      <div style="height:1px; background-color:var(--color-sage-mid); margin-bottom:1.25rem;"></div>
+      <button class="btn-primary" onclick="tutupModal('feed')" style="width:100%; margin-bottom:0.6rem;">
+        Lihat Ruang Bersama 🫂
+      </button>
+      <button onclick="tutupModal('curhat')" style="width:100%; background:transparent; border:none; color:var(--color-muted); font-size:0.82rem; font-weight:600; cursor:pointer; padding:0.4rem;">
+        Kembali Rehat
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ JAVASCRIPT ═══════════════════════ -->
+  <script>
+    // ── Konstanta warna avatar (rotasi berdasarkan huruf pertama username) ──
+    const AVATAR_COLORS = [
+      '#4a7c59','#5c7fa0','#a05c7f','#7f7040','#5c4fa0',
+      '#a0704a','#3a7d6e','#6e3a7d','#7d3a3a','#3a547d'
+    ];
+
+    function avatarColor(name) {
+      const code = (name || 'A').toUpperCase().charCodeAt(0);
+      return AVATAR_COLORS[code % AVATAR_COLORS.length];
+    }
+
+    function initials(name) {
+      return (name || '?').slice(0, 2).toUpperCase();
+    }
+
+    // ── Format waktu relatif ──
+    function relativeTime(ts) {
+      const diff = Date.now() - ts;
+      const m = Math.floor(diff / 60000);
+      if (m < 1)  return 'baru saja';
+      if (m < 60) return `${m} menit lalu`;
+      const h = Math.floor(m / 60);
+      if (h < 24) return `${h} jam lalu`;
+      const d = Math.floor(h / 24);
+      return `${d} hari lalu`;
+    }
+
+    // ── Storage (localStorage, sesi-lokal untuk demo) ──
+    const STORAGE_KEY = 'sobattenang_curhat_v2';
+    const MAX_ENTRIES = 60;
+
+    function loadEntries() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      } catch { return []; }
+    }
+
+    function saveEntry(entry) {
+      const entries = loadEntries();
+      entries.unshift(entry); // terbaru di atas
+      if (entries.length > MAX_ENTRIES) entries.length = MAX_ENTRIES;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    function updateHugs(id, delta) {
+      const entries = loadEntries();
+      const idx = entries.findIndex(e => e.id === id);
+      if (idx !== -1) {
+        entries[idx].hugs = (entries[idx].hugs || 0) + delta;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+        return entries[idx].hugs;
+      }
+      return 0;
+    }
+
+    // ── Tab switching ──
+    function switchTab(tab) {
+      document.getElementById('panel-curhat').style.display = tab === 'curhat' ? 'block' : 'none';
+      document.getElementById('panel-feed').style.display   = tab === 'feed'   ? 'block' : 'none';
+      document.getElementById('tab-curhat').classList.toggle('active', tab === 'curhat');
+      document.getElementById('tab-feed').classList.toggle('active',   tab === 'feed');
+      if (tab === 'feed') renderFeed();
+    }
+
+    // ── Render feed ──
+    function renderFeed() {
+      const entries = loadEntries();
+      const list    = document.getElementById('feedList');
+      const empty   = document.getElementById('feedEmpty');
+      const count   = document.getElementById('feedCount');
+
+      list.innerHTML = '';
+
+      if (entries.length === 0) {
+        empty.style.display = 'block';
+        count.textContent   = 'Belum ada curhatan';
+        return;
+      }
+
+      empty.style.display = 'none';
+      count.textContent   = `${entries.length} curhatan tersimpan`;
+
+      // Ambil hug-state dari sessionStorage (per sesi)
+      let huggedSet = new Set(JSON.parse(sessionStorage.getItem('hugged') || '[]'));
+
+      entries.forEach(entry => {
+        const isHugged = huggedSet.has(entry.id);
+        const card = document.createElement('div');
+        card.className = 'card feed-entry';
+        card.style.marginBottom = '0.875rem';
+        card.innerHTML = `
+          <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.875rem;">
+            <div class="avatar" style="background-color:${avatarColor(entry.username)};">
+              ${initials(entry.username)}
+            </div>
+            <div style="flex:1; min-width:0;">
+              <p style="font-weight:700; font-size:0.88rem; color:var(--color-text); margin:0;">@${escHtml(entry.username)}</p>
+              <p style="font-size:0.72rem; color:var(--color-muted); margin:0;">${relativeTime(entry.ts)}</p>
+            </div>
+          </div>
+          <p style="font-size:0.88rem; line-height:1.7; color:var(--color-text); margin:0 0 1rem; word-break:break-word;">
+            ${escHtml(entry.text).replace(/\n/g, '<br>')}
+          </p>
+          <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--color-sage-mid); padding-top:0.75rem;">
+            <button
+              class="hug-btn ${isHugged ? 'hugged' : ''}"
+              id="hug-${entry.id}"
+              onclick="toggleHug('${entry.id}', this)"
+            >
+              🤗 <span id="hug-count-${entry.id}">${entry.hugs || 0}</span> Pelukan
+            </button>
+            <span style="font-size:0.7rem; color:var(--color-sage-dark);">SobatTenang</span>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    function muat() {
+      renderFeed();
+    }
+
+    // ── Hug toggle ──
+    function toggleHug(id, btn) {
+      let huggedSet = new Set(JSON.parse(sessionStorage.getItem('hugged') || '[]'));
+      const isHugged = huggedSet.has(id);
+      const delta = isHugged ? -1 : 1;
+      if (isHugged) huggedSet.delete(id); else huggedSet.add(id);
+      sessionStorage.setItem('hugged', JSON.stringify([...huggedSet]));
+      const newCount = updateHugs(id, delta);
+      document.getElementById(`hug-count-${id}`).textContent = newCount;
+      btn.classList.toggle('hugged', !isHugged);
+    }
+
+    // ── HTML escape ──
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;');
+    }
+
+    // ── Generate ID unik sederhana ──
+    function uid() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+    }
+
+    // ── Kirim curhat ──
+    function kirimCurhat() {
+      const usernameEl = document.getElementById('usernameInput');
+      const textEl     = document.getElementById('curhatInput');
+      const username   = usernameEl.value.trim();
+      const teks       = textEl.value.trim();
+
+      if (username === '') {
+        showFieldError(usernameEl, 'Tulis username kamu dulu ya, biar teman-teman tahu siapa yang berbagi. 👤');
+        usernameEl.focus();
+        return;
+      }
+
+      if (teks === '') {
+        showFieldError(textEl, 'Kotaknya masih kosong, tulis sesuatu dulu yuk sebelum mengirim. 💬');
+        textEl.focus();
+        return;
+      }
+
+      // Simpan entri baru
+      saveEntry({
+        id:       uid(),
+        username: username,
+        text:     teks,
+        ts:       Date.now(),
+        hugs:     0
+      });
+
+      // Kosongkan textarea, pertahankan username
+      textEl.value = '';
+
+      // Tampilkan modal dengan sapaan nama
+      document.getElementById('modalName').textContent = `Hai, @${username} 👋`;
+      const modal = document.getElementById('modal');
+      modal.classList.remove('hidden');
+      modal.style.display = 'flex';
+    }
+
+    function showFieldError(el, msg) {
+      // Gunakan alert sederhana agar tetap kompatibel
+      alert(msg);
+      el.style.borderColor = '#e07070';
+      el.addEventListener('input', () => { el.style.borderColor = ''; }, { once: true });
+    }
+
+    // ── Tutup modal ──
+    function tutupModal(gotoTab) {
+      const modal = document.getElementById('modal');
+      modal.style.display = 'none';
+      modal.classList.add('hidden');
+
+      if (gotoTab === 'feed') {
+        switchTab('feed');
+        document.getElementById('main-tabs').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        // scroll ke tips
+        setTimeout(() => {
+          document.querySelector('section:last-of-type')
+            ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+    }
+
+    // Tutup modal saat backdrop diklik
+    document.getElementById('modal').addEventListener('click', function(e) {
+      if (e.target === this) tutupModal('curhat');
+    });
+
+    // ── Init: isi contoh curhatan jika masih kosong ──
+    (function seedData() {
+      if (loadEntries().length > 0) return;
+      const contoh = [
+        { username: 'BintangKecil27', text: 'Hari ini rasanya semua kerja keras aku sia-sia. Nilai ujian turun padahal udah belajar semalaman. Aku capek banget tapi nggak tau harus cerita ke siapa.' },
+        { username: 'AyuSenyumDulu',  text: 'Teman-teman di sekolah kayak nggak ngeh aku ada. Makan siang sendirian lagi. Tapi aku coba inget, ini bukan salah aku. Semangat yuk buat kita semua yang lagi berjuang 💪' },
+        { username: 'RizkyDalamHati', text: 'Bokap sama nyokap lagi sering berantem di rumah. Jadi susah fokus belajar. Pengen punya tempat tenang buat sekadar napas.' },
+      ];
+      const now = Date.now();
+      contoh.forEach((c, i) => {
+        const entry = { id: uid(), username: c.username, text: c.text, ts: now - (i+1)*3600000*2, hugs: Math.floor(Math.random()*8)+1 };
+        const entries = loadEntries();
+        entries.push(entry);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+      });
+    })();
+  </script>
+
+</body>
+</html>
